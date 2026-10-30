@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG RUNNER_VERSION=2.328.0
 ARG RUNNER_SHA256=01066fad3a2893e63e6ca880ae3a1fad5bf9329d60e77ee15f2b97c148c3cd4e
