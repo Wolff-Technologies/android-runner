@@ -18,4 +18,7 @@ RUN sdkmanager "platform-tools" "emulator" "platforms;android-35" "system-images
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 COPY --chmod=755 wait-for-emulator.sh /usr/local/bin/wait-for-emulator
 USER runner
+# Install Maestro once in the runner image instead of downloading it per CI job.
+ENV PATH=/home/runner/.maestro/bin:$PATH
+RUN curl -fsSL https://get.maestro.mobile.dev | bash
 ENTRYPOINT ["/entrypoint.sh"]
