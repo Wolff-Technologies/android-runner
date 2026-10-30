@@ -10,10 +10,12 @@ services:
     shm_size: 2gb
     environment:
       GITHUB_ORGANIZATION: "${GITHUB_ORGANIZATION:?}"
-      GH_PAT: "${GH_PAT:?}"
+      RUNNER_TOKEN: "${RUNNER_TOKEN:-}"
       RUNNER_NAME: "${RUNNER_NAME:-android-runner-unraid}"
       RUNNER_LABELS: android-emulator
     volumes:
       - runner-work:/home/runner/_work
+      - runner-state:/home/runner/runner-state
 volumes:
   runner-work:
+  runner-state:

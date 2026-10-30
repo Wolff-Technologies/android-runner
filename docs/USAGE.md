@@ -2,19 +2,30 @@
 
 Requires a Linux x86_64 host with working `/dev/kvm`, Docker Compose, and sufficient RAM (12 GB recommended).
 
-1. Copy `.env.example` to `.env`. Do not commit `.env`.
-2. Set `KVM_GID` from `stat -c '%g' /dev/kvm` (100 on the configured Unraid host).
-3. Set `GITHUB_ORGANIZATION` to your GitHub organization, e.g. `Wolff-Technologies`.
-4. Supply `GH_PAT` securely. The token must have **organization Self-hosted runners: Read and write** permission (fine-grained PAT) or `admin:org` for a classic PAT, subject to organization policies. The token is used to request short-lived registration and removal tokens.
-5. Run `docker compose up -d --build`.
-6. In the GitHub organization, configure **Settings → Actions → Runners → Runner groups** to restrict repository access to trusted repositories such as `opusdei`.
+## Initial registration
 
-Trusted workflows in permitted repositories can use `runs-on: [self-hosted, Linux, X64, android-emulator]`.
+1. Copy `.env.example` to `.env` (do not commit it), or configure the same variables in Unraid Docker Manager.
+2. Set `GITHUB_ORGANIZATION=Wolff-Technologies`. Set `KVM_GID` using `stat -c '%g' /dev/kvm` (100 on this Unraid host).
+3. Open GitHub organization **Settings → Actions → Runners → New runner**. Copy the short-lived organization registration token from the generated `config.sh --token` command into `RUNNER_TOKEN`. **This is not a PAT.**
+4. Start the container. It registers once, storing its runner identity in `/home/runner/runner-state`.
+5. After successful registration, remove `RUNNER_TOKEN` from the Unraid template or `.env` and restart the container. The existing identity will be reused.
+6. Restrict organization runner group access to trusted repositories, such as `opusdei`.
 
-This image installs the emulator but does not launch it automatically. Start it during a trusted workflow job:
+## Persistence on Unraid
+
+Map `/mnt/user/appdata/android-runner/state` to `/home/runner/runner-state` and `/mnt/user/appdata/android-runner/work` to `/home/runner/_work`. Map the device `/dev/kvm` to `/dev/kvm`, and set Docker extra parameters `--group-add=100 --shm-size=2g`. Privileged mode is not required.
+
+Keep the runner-state directory when recreating or upgrading the container. Do not wipe it as part of workspace cleanup. If you remove the runner in GitHub, stop the container, delete its persisted runner-state contents, and register again with a fresh token.
+
+## Running emulator jobs
+
+Trusted workflows in allowed repositories can use `runs-on: [self-hosted, Linux, X64, android-emulator]`.
+
+The emulator is installed but not launched automatically. Start it inside a trusted workflow job:
+
 ```bash
 emulator -avd ci-android -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on > emulator.log 2>&1 &
 wait-for-emulator
 ```
 
-Use one emulator job at a time. Do not execute untrusted PR code on a persistent organization runner. Restrict runner groups, rotate credentials, and clean the workspace between jobs. Production hardening and emulator integration testing remain required.
+Run one emulator job at a time. Avoid untrusted pull requests on persistent self-hosted runners. Production hardening and emulator integration testing remain required.
