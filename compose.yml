@@ -1,0 +1,19 @@
+services:
+  android-runner:
+    build: .
+    image: android-runner:local
+    restart: unless-stopped
+    devices:
+      - /dev/kvm:/dev/kvm
+    group_add:
+      - "${KVM_GID:?Set KVM_GID to the host KVM group ID}"
+    shm_size: 2gb
+    environment:
+      GITHUB_ORGANIZATION: "${GITHUB_ORGANIZATION:?}"
+      GH_PAT: "${GH_PAT:?}"
+      RUNNER_NAME: "${RUNNER_NAME:-android-runner-unraid}"
+      RUNNER_LABELS: android-emulator
+    volumes:
+      - runner-work:/home/runner/_work
+volumes:
+  runner-work:
