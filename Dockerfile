@@ -1,7 +1,7 @@
 FROM ubuntu:24.04
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-ARG RUNNER_VERSION=2.328.0
-ARG RUNNER_SHA256=01066fad3a2893e63e6ca880ae3a1fad5bf9329d60e77ee15f2b97c148c3cd4e
+ARG RUNNER_VERSION=2.338.2
+ARG RUNNER_SHA256=baebf204307bac6193480852732f0aba2ae97b6c5597c244f4d5558390147c40
 ENV DEBIAN_FRONTEND=noninteractive ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk ANDROID_AVD_HOME=/home/runner/.android/avd PATH=/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/emulator:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates unzip git jq openjdk-17-jdk libglu1-mesa libpulse0 libnss3 libx11-6 libxcb1 libxcomposite1 libxcursor1 libxi6 libxtst6 libxrandr2 libasound2t64 libicu74 libdbus-1-3 libgbm1 libxkbcommon0 && rm -rf /var/lib/apt/lists/*
 RUN useradd -m -s /bin/bash runner && mkdir -p /opt/actions-runner /opt/android-sdk && chown -R runner:runner /opt/actions-runner /opt/android-sdk
