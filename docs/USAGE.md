@@ -9,7 +9,7 @@ Requires a Linux x86_64 host with working `/dev/kvm`, Docker Compose, and suffic
 3. Open GitHub organization **Settings → Actions → Runners → New runner**. Copy the short-lived organization registration token from the generated `config.sh --token` command into `RUNNER_TOKEN`. **This is not a PAT.**
 4. Start the container. It registers once, storing its runner identity in `/home/runner/runner-state`.
 5. After successful registration, remove `RUNNER_TOKEN` from the Unraid template or `.env` and restart the container. The existing identity will be reused.
-6. Restrict organization runner group access to trusted repositories, such as `opusdei`.
+6. Restrict organization runner group access to trusted repositories, such as `Android-planOfLife`.
 
 ## Persistence on Unraid
 
@@ -21,9 +21,12 @@ Keep the runner-state directory when recreating or upgrading the container. Do n
 
 Trusted workflows in allowed repositories can use `runs-on: [self-hosted, Linux, X64, android-emulator]`.
 
-The emulator is installed but not launched automatically. Start it inside a trusted workflow job:
+The image includes the emulator, platform tools, and the API 35 Google APIs x86_64 system image. Native workflows provision their build JDK and compile SDK, and emulator jobs install Maestro on first use and create their own virtual device.
+
+For a manual emulator job, create and start a virtual device inside the job:
 
 ```bash
+printf 'no\n' | avdmanager create avd --name ci-android --package 'system-images;android-35;google_apis;x86_64'
 emulator -avd ci-android -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -accel on > emulator.log 2>&1 &
 wait-for-emulator
 ```

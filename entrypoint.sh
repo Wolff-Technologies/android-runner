@@ -6,10 +6,6 @@ export RUNNER_LABELS="${RUNNER_LABELS:-android-emulator}"
 export RUNNER_WORKDIR="${RUNNER_WORKDIR:-/home/runner/_work}"
 state_dir="/home/runner/runner-state"
 mkdir -p "$RUNNER_WORKDIR" "$ANDROID_AVD_HOME" "$state_dir"
-if ! command -v emulator >/dev/null; then echo "Android emulator missing"; exit 1; fi
-if ! avdmanager list avd | grep -q 'Name: ci-android'; then
-  echo no | avdmanager create avd -n ci-android -k 'system-images;android-35;google_apis;x86_64' --force
-fi
 # Restore existing registration before starting the listener.
 for file in .runner .credentials .credentials_rsaparams; do
   if [[ -L "$file" ]]; then rm "$file"; fi
